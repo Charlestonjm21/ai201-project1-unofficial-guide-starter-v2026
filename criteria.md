@@ -23,8 +23,7 @@ For at least 4 of my 5 test questions, the retrieved chunks include one that
 contains the answer.
 
 **Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+Our 23 documents are informal student advice threads where critical answers often appear in single-sentence replies rather than thread titles. While standard questions should match well, setting the threshold to 4 rather than 5 accounts for the difficulty of retrieving short, dense details (such as a single "$20" or "12-minute" mention) that might score lower against broader conversational embeddings.
 
 ---
 
@@ -33,8 +32,7 @@ contains the answer.
 Every answer the system produces names at least one source document.
 
 **Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+Every ingested chunk originates from a distinct, named .txt file representing a specific advice thread. Because our retrieval pipeline automatically attaches file metadata to every retrieved chunk, any answer generated from retrieved context will have access to a source document unless the retrieval step fails completely.
 
 ---
 
@@ -44,53 +42,32 @@ When I ask a question my documents clearly don't cover, the relevance gate
 stops it and the system returns "I don't have enough information about that" —
 in at least 4 of 5 tries.
 
-<!-- The five questions are the ones in `OUT_OF_SCOPE` at the bottom of
-     `questions.py`, and `run_eval.py` puts them through the gate and writes
-     what happened into your run log. Swap them for your own if you'd rather —
-     just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
 
 **Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+The corpus is strictly bounded to 23 student-life advice topics, so out-of-scope questions (such as campus dining hours or local politics) should have noticeable semantic separation. Aiming for 4 of 5 reflects the expectation that most unrelated queries will be stopped by the distance threshold, while leaving a realistic margin for borderline embedding matches before exact cutoffs are calibrated.
 
 ---
 
 ## 4. Something about your chunks
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
+When 5 random chunks are inspected, at least 4 of 5 must contain both the thread title line (THREAD: ...) and at least one full reply (--- reply ... --- followed by complete sentences) without text being cut off mid-sentence at either boundary.
 
 
 
 **Why this target:**
-
+Our average chunk size is 487 characters, which is large enough to contain an entire short thread, but our minimum was only 2 characters. Setting a 4-of-5 target accounts for occasional structural edge cases (like trailing lines or isolated vote tallies) while ensuring an evaluator can easily verify that the vast majority of chunks hold standalone conversational context.
 
 
 ---
 
 ## 5. Your choice
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
+For at least 4 of my 5 test questions, the generated response must explicitly contain the exact string defined in that question's expects field in questions.py (e.g., "$20", "16GB", "February and March").
 
 
 
 **Why this target:**
-
+An advice tool is only useful if it delivers the specific numeric and temporal facts students need. Evaluating against the exact expects field provides an automated, binary pass/fail test that removes subjectivity and verifies the generator extracts target entities rather than returning vague summaries.
 
 
 ---
